@@ -1,13 +1,31 @@
 import React from "react";
-import { Text } from "react-native";
+
 import Permissions from "react-native-permissions";
+import {
+  Container,
+  Header,
+  Content,
+  Card,
+  CardItem,
+  Text,
+  Icon,
+  Right,
+  Title,
+  Left,
+  Body
+} from "native-base";
 const RNFS = require("react-native-fs");
 import { connect } from "react-redux";
-import { setSongs } from "../redux/actions"
+import { setSongs } from "../redux/actions";
 
 class SongListPage extends React.Component {
-
   componentDidMount() {
+    Permissions.request("storage").then(response => {
+      // Returns once the user has chosen to 'allow' or to 'not allow' access
+      // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
+      this.setState({ storagePermission: response });
+    });
+
     this.getFiles();
   }
 
@@ -28,16 +46,31 @@ class SongListPage extends React.Component {
 
   mapSongs() {
     return this.props.songs.map(song => (
-      <Text key={song.path}>{song.name}</Text>
+      <CardItem key={song.path}>
+        <Icon active name="music-note" type="MaterialIcons"/>
+        <Text>{song.name}</Text>
+      </CardItem>
     ));
   }
 
   render() {
     if (this.props.songs.length === 0) {
-      return <Text>Loading...</Text>
+      return <Text>Loading...</Text>;
     }
 
-    return this.mapSongs();
+    return (
+      <Container>
+        <Header>
+          <Body>
+            <Title>Kumusic</Title>
+          </Body>
+          <Right />
+        </Header>
+        <Content>
+          <Card>{this.mapSongs()}</Card>
+        </Content>
+      </Container>
+    );
   }
 }
 
@@ -51,6 +84,7 @@ async function getAllFilesByExtension(startingPath, extension) {
     console.log(err);
   }
 
+  // recursive function
   async function getFilesByExtension(path, extension) {
     const result = await RNFS.readDir(path);
 
@@ -68,4 +102,7 @@ async function getAllFilesByExtension(startingPath, extension) {
   }
 }
 
-export default connect(store => ({ songs: store.songs }), { setSongs })(SongListPage);
+export default connect(
+  store => ({ songs: store.songs }),
+  { setSongs }
+)(SongListPage);
