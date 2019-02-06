@@ -20,6 +20,10 @@ import { connect } from "react-redux";
 import { setSongs } from "../redux/actions";
 
 class SongListPage extends React.Component {
+  static navigationOptions = {
+    title: 'Music library',
+    /* No more header config here! */
+  };
   componentDidMount() {
     Permissions.request("storage").then(response => {
       // Returns once the user has chosen to 'allow' or to 'not allow' access
@@ -47,8 +51,15 @@ class SongListPage extends React.Component {
 
   mapSongs() {
     return this.props.songs.map(song => (
-      <CardItem key={song.path} button onPress={() => alert("This is Card Header")}>
-        <Icon active name="music-note" type="MaterialIcons"/>
+      <CardItem
+        key={song.path}
+        button
+        onPress={() => this.props.navigation.navigate("PlayerPage", {
+          path: song.path,
+          name: song.name
+        })}
+      >
+        <Icon active name="music-note" type="MaterialIcons" />
         <Text>{song.name}</Text>
       </CardItem>
     ));
@@ -61,12 +72,6 @@ class SongListPage extends React.Component {
 
     return (
       <Container>
-        <Header>
-          <Body>
-            <Title>Kumusic</Title>
-          </Body>
-          <Right />
-        </Header>
         <Content>
           <Card>{this.mapSongs()}</Card>
         </Content>
