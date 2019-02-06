@@ -12,7 +12,8 @@ import {
   Right,
   Title,
   Left,
-  Body
+  Body,
+  Button
 } from "native-base";
 const RNFS = require("react-native-fs");
 import { connect } from "react-redux";
@@ -46,7 +47,7 @@ class SongListPage extends React.Component {
 
   mapSongs() {
     return this.props.songs.map(song => (
-      <CardItem key={song.path}>
+      <CardItem key={song.path} button onPress={() => alert("This is Card Header")}>
         <Icon active name="music-note" type="MaterialIcons"/>
         <Text>{song.name}</Text>
       </CardItem>
