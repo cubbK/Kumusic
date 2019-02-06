@@ -2,11 +2,10 @@ import React from "react";
 import { Text } from "react-native";
 import Permissions from "react-native-permissions";
 const RNFS = require("react-native-fs");
+import { connect } from "react-redux";
+import { setSongs } from "../redux/actions"
 
-export default class SongListPage extends React.Component {
-  state = {
-    songs: []
-  }
+class SongListPage extends React.Component {
 
   componentDidMount() {
     this.getFiles();
@@ -23,19 +22,21 @@ export default class SongListPage extends React.Component {
     );
 
     const allFiles = await [...mp3Files, ...m4aFiles];
-      
-    console.log(allFiles)
 
-    this.setState({
-      songs: allFiles
-    })
+    this.props.setSongs(allFiles);
   }
 
-  mapSongs () {
-    return this.state.songs.map(song => <Text key={song.path}>{song.name}</Text>)
+  mapSongs() {
+    return this.props.songs.map(song => (
+      <Text key={song.path}>{song.name}</Text>
+    ));
   }
 
   render() {
+    if (this.props.songs.length === 0) {
+      return <Text>Loading...</Text>
+    }
+
     return this.mapSongs();
   }
 }
@@ -61,8 +62,10 @@ async function getAllFilesByExtension(startingPath, extension) {
           path: item.path
         });
       } else if (item.isDirectory()) {
-         await getFilesByExtension(item.path, extension)
+        await getFilesByExtension(item.path, extension);
       }
     }
   }
 }
+
+export default connect(store => ({ songs: store.songs }), { setSongs })(SongListPage);
