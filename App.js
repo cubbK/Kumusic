@@ -17,7 +17,7 @@ const AppNavigator = createStackNavigator(
     /* The header config from HomeScreen is now here */
     defaultNavigationOptions: {
       headerStyle: {
-        backgroundColor: "#f4511e"
+        backgroundColor: "#222"
       },
       headerTintColor: "#fff",
       headerTitleStyle: {
@@ -34,7 +34,7 @@ export default class App extends Component {
     return (
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <StatusBar backgroundColor="#f4511e" barStyle="light-content" />
+          <StatusBar backgroundColor="#222" barStyle="light-content" />
           <Routes />
         </PersistGate>
       </Provider>
