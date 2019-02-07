@@ -14,6 +14,8 @@ import com.facebook.soloader.SoLoader;
 import java.util.Arrays;
 import java.util.List;
 
+import com.futurice.rctaudiotoolkit.AudioPackage; // <-------- here
+
 public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
@@ -28,7 +30,8 @@ public class MainApplication extends Application implements ReactApplication {
           new MainReactPackage(),
             new LinearGradientPackage(),
             new RNGestureHandlerPackage(),
-            new RNFSPackage()
+            new RNFSPackage(),
+            new AudioPackage() // <------------------------------- here
       );
     }
 
