@@ -64,8 +64,12 @@ export default class Player extends React.Component {
           <ChangeSongButton onPress={this.props.onPrev} bordered rounded>
             <PrevIcon active name="skip-previous" type="MaterialIcons" />
           </ChangeSongButton>
-          <PlayButton onPress={this.props.onPlay} bordered rounded>
-            <PlayIcon active name="play-arrow" type="MaterialIcons" />
+          <PlayButton onPress={this.props.togglePlay} bordered rounded>
+            {this.props.isPlaying ? (
+              <PlayIcon active name="pause" type="MaterialIcons" />
+            ) : (
+              <PlayIcon active name="play-arrow" type="MaterialIcons" />
+            )}
           </PlayButton>
           <ChangeSongButton onPress={this.props.onNext} bordered rounded>
             <PrevIcon active name="skip-next" type="MaterialIcons" />
