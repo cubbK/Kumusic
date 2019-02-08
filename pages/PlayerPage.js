@@ -47,13 +47,26 @@ class PlayerPage extends React.Component {
     }
   };
 
+  navigateToNextSong = () => {
+    this.props.navigation.replace("PlayerPage", this.props.nextSong);
+  };
+
+  navigateToPrevSong = () => {
+    this.props.navigation.replace("PlayerPage", this.props.previousSong);
+  }
+
   render() {
     const { navigation } = this.props;
     const path = navigation.getParam("path", null);
     const name = navigation.getParam("name", "No Name");
 
     return (
-      <Player isPlaying={this.state.isPlaying} togglePlay={this.togglePlay} />
+      <Player
+        isPlaying={this.state.isPlaying}
+        togglePlay={this.togglePlay}
+        onNext={this.navigateToNextSong}
+        onPrev={this.navigateToPrevSong}
+      />
     );
   }
 }
@@ -62,7 +75,7 @@ function mapStateToProps(state, ownProps) {
   const { navigation } = ownProps;
   const currentPath = navigation.getParam("path", null);
 
-  const currentIndex = state.songs.findIndex(song => (song.path === currentPath));
+  const currentIndex = state.songs.findIndex(song => song.path === currentPath);
 
   let nextIndex = null;
   let previousIndex = null;
@@ -70,7 +83,7 @@ function mapStateToProps(state, ownProps) {
   if (currentIndex === 0) {
     nextIndex = 1;
     previousIndex = state.songs.length - 1;
-  } else if (currentIndex === state.songs.length -1) {
+  } else if (currentIndex === state.songs.length - 1) {
     nextIndex = 0;
     previousIndex = currentIndex - 1;
   } else {
