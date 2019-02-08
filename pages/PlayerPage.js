@@ -22,7 +22,7 @@ class PlayerPage extends React.Component {
     this.player = new PlayerSound(path, {
       autoDestroy: true,
       continuesToPlayInBackground: true
-    })
+    });
 
     this.player.play(err => {
       if (err) {
@@ -31,32 +31,57 @@ class PlayerPage extends React.Component {
         this.setState({ isPlaying: true });
       }
     });
-
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.player.destroy();
   }
 
   togglePlay = () => {
     if (this.state.isPlaying === true) {
       this.player.pause();
-      this.setState({isPlaying: false})
+      this.setState({ isPlaying: false });
     } else {
-      this.player.play()
-      this.setState({isPlaying: true})
+      this.player.play();
+      this.setState({ isPlaying: true });
     }
-  }
+  };
 
   render() {
     const { navigation } = this.props;
     const path = navigation.getParam("path", null);
     const name = navigation.getParam("name", "No Name");
 
-    console.log("previous player: ", this.props.previousPlayer)
-    return <Player isPlaying={this.state.isPlaying} togglePlay={this.togglePlay}/>;
+    return (
+      <Player isPlaying={this.state.isPlaying} togglePlay={this.togglePlay} />
+    );
   }
 }
 
+function mapStateToProps(state, ownProps) {
+  const { navigation } = ownProps;
+  const currentPath = navigation.getParam("path", null);
 
-export default (PlayerPage)
+  const currentIndex = state.songs.findIndex(song => (song.path === currentPath));
+
+  let nextIndex = null;
+  let previousIndex = null;
+
+  if (currentIndex === 0) {
+    nextIndex = 1;
+    previousIndex = state.songs.length - 1;
+  } else if (currentIndex === state.songs.length -1) {
+    nextIndex = 0;
+    previousIndex = currentIndex - 1;
+  } else {
+    nextIndex = currentIndex + 1;
+    previousIndex = currentIndex - 1;
+  }
+
+  return {
+    previousSong: state.songs[previousIndex],
+    nextSong: state.songs[nextIndex]
+  };
+}
+
+export default connect(mapStateToProps)(PlayerPage);
