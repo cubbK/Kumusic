@@ -12,7 +12,8 @@ class PlayerPage extends React.Component {
   };
 
   state = {
-    isPlaying: false
+    isPlaying: false,
+    progress: 0
   };
 
   componentDidMount() {
@@ -23,6 +24,7 @@ class PlayerPage extends React.Component {
       autoDestroy: true,
       continuesToPlayInBackground: true
     });
+    this.player.wakeLock = true;
 
     this.player.play(err => {
       if (err) {
@@ -31,10 +33,26 @@ class PlayerPage extends React.Component {
         this.setState({ isPlaying: true });
       }
     });
+
+    this.lastSeek = 0;
+    this._progressInterval = setInterval(() => {
+      if (this.player && this._shouldUpdateProgressBar()) {
+        // && !this._dragging) {
+        this.setState({
+          progress: Math.max(0, this.player.currentTime) / this.player.duration
+        });
+      }
+    }, 100);
   }
 
   componentWillUnmount() {
     this.player.destroy();
+    clearInterval(this._progressInterval);
+  }
+
+  _shouldUpdateProgressBar() {
+    // Debounce progress bar update by 200 ms
+    return Date.now() - this.lastSeek > 200;
   }
 
   togglePlay = () => {
@@ -53,7 +71,12 @@ class PlayerPage extends React.Component {
 
   navigateToPrevSong = () => {
     this.props.navigation.replace("PlayerPage", this.props.previousSong);
-  }
+  };
+
+  onSliderChange = value => {
+    this.player.seek(value * this.player.duration);
+    this.setState({ progress: value });
+  };
 
   render() {
     const { navigation } = this.props;
@@ -66,6 +89,8 @@ class PlayerPage extends React.Component {
         togglePlay={this.togglePlay}
         onNext={this.navigateToNextSong}
         onPrev={this.navigateToPrevSong}
+        sliderValue={this.state.progress}
+        onSliderChange={this.onSliderChange}
       />
     );
   }

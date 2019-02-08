@@ -4,6 +4,7 @@ import CoolBox from "./player/CoolBox";
 import { lighten } from "polished";
 import { Icon } from "native-base";
 import { Button } from "native-base";
+import Slider from "react-native-slider";
 
 const Container = styled.View`
   background-color: #222;
@@ -13,8 +14,6 @@ const Container = styled.View`
 const Controls = styled.View`
   width: 100%;
   height: 80px;
-  border-top-color: ${lighten(0.03, "#222")};
-  border-top-width: 3px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -60,6 +59,12 @@ export default class Player extends React.Component {
     return (
       <Container>
         <CoolBox />
+        <Slider
+          value={this.props.sliderValue}
+          onSlidingComplete={this.props.onSliderChange}
+          animateTransitions={true}
+          animationType="spring"
+        />
         <Controls>
           <ChangeSongButton onPress={this.props.onPrev} bordered rounded>
             <PrevIcon active name="skip-previous" type="MaterialIcons" />
