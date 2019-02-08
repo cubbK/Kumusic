@@ -62,8 +62,8 @@ export default class Player extends React.Component {
         <Slider
           value={this.props.sliderValue}
           onSlidingComplete={this.props.onSliderChange}
-          animateTransitions={true}
-          animationType="spring"
+          onSlidingStart={this.props.onSlidingStart}
+          
         />
         <Controls>
           <ChangeSongButton onPress={this.props.onPrev} bordered rounded>
