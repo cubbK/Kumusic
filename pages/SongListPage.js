@@ -21,7 +21,7 @@ import { setSongs } from "../redux/actions";
 
 class SongListPage extends React.Component {
   static navigationOptions = {
-    title: 'Music library',
+    title: "Music library"
     /* No more header config here! */
   };
   componentDidMount() {
@@ -29,22 +29,18 @@ class SongListPage extends React.Component {
       // Returns once the user has chosen to 'allow' or to 'not allow' access
       // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
       this.setState({ storagePermission: response });
+      this.getFiles();
     });
-
-    this.getFiles();
   }
 
   async getFiles() {
-    const mp3Files = await getAllFilesByExtension(
-      "/storage/emulated/0/",
-      ".mp3"
-    );
-    const m4aFiles = await getAllFilesByExtension(
-      "/storage/emulated/0/",
+    const allFiles = await getAllFilesByExtension("/storage/emulated/0/", [
+      ".mp3",
       ".m4a"
-    );
+    ]);
 
-    const allFiles = await [...mp3Files, ...m4aFiles];
+    console.log("finished");
+    console.log(allFiles);
 
     this.props.setSongs(allFiles);
   }
@@ -54,10 +50,12 @@ class SongListPage extends React.Component {
       <CardItem
         key={song.path}
         button
-        onPress={() => this.props.navigation.navigate("PlayerPage", {
-          path: song.path,
-          name: song.name
-        })}
+        onPress={() =>
+          this.props.navigation.navigate("PlayerPage", {
+            path: song.path,
+            name: song.name
+          })
+        }
       >
         <Icon active name="music-note" type="MaterialIcons" />
         <Text>{song.name}</Text>
@@ -67,7 +65,18 @@ class SongListPage extends React.Component {
 
   render() {
     if (this.props.songs.length === 0) {
-      return <Text>Loading...</Text>;
+      return (
+        <Container>
+          <Content>
+            <Card>
+              <CardItem>
+                <Icon active name="hourglass-empty" type="MaterialIcons" />
+                <Text>Searching for audio files...</Text>
+              </CardItem>
+            </Card>
+          </Content>
+        </Container>
+      );
     }
 
     return (
@@ -82,29 +91,43 @@ class SongListPage extends React.Component {
 
 async function getAllFilesByExtension(startingPath, extension) {
   let files = [];
-
-  try {
-    await getFilesByExtension(startingPath, extension);
-    return files;
-  } catch (err) {
-    console.log(err);
-  }
+  await getFilesByExtension(startingPath, extension);
+  return files;
 
   // recursive function
-  async function getFilesByExtension(path, extension) {
+  async function getFilesByExtension(path, extensionsToCheck) {
     const result = await RNFS.readDir(path);
 
+    // For each children file or folder of result
     for (item of result) {
-      const itemExtension = item.name.slice(-1 * extension.length);
-      if (item.isFile() && itemExtension === extension) {
+      if (
+        item.isFile() &&
+        hasFileTheRightExtension(item.name, extensionsToCheck)
+      ) {
         files.push({
           name: item.name,
           path: item.path
         });
       } else if (item.isDirectory()) {
+        // run the same function recursively, only with the children path as root
         await getFilesByExtension(item.path, extension);
       }
     }
+  }
+
+  function hasFileTheRightExtension(fileName, extensionsToCheck) {
+    const fileNameLastLettersList = extensionsToCheck.map(extensionToCheck =>
+      fileName.slice(-1 * extensionToCheck.length)
+    );
+
+    for (const fileNameLastLetters of fileNameLastLettersList) {
+      if (extensionsToCheck.includes(fileNameLastLetters)) {
+        console.log(fileName);
+        return true;
+      }
+    }
+
+    return false;
   }
 }
 
