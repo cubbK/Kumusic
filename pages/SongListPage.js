@@ -39,9 +39,6 @@ class SongListPage extends React.Component {
       ".m4a"
     ]);
 
-    console.log("finished");
-    console.log(allFiles);
-
     this.props.setSongs(allFiles);
   }
 
@@ -122,7 +119,6 @@ async function getAllFilesByExtension(startingPath, extension) {
 
     for (const fileNameLastLetters of fileNameLastLettersList) {
       if (extensionsToCheck.includes(fileNameLastLetters)) {
-        console.log(fileName);
         return true;
       }
     }
